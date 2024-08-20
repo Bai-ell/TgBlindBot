@@ -3,6 +3,7 @@ import aiohttp
 
 QUESTIONNAIRE_CREATE = 'http://127.0.0.1:8000/questionnaire/create/'
 INSTITUTIONS = 'http://127.0.0.1:8000/institutions/institutions/'
+GIFT_URL = 'http://127.0.0.1:8000/questionnaire/gifts'
 BOTWORDS = 'http://127.0.0.1:8000/botwords/botwords/'
 BUTTONS  = 'http://127.0.0.1:8000/buttons/buttons/'
 CONTACTS = 'http://127.0.0.1:8000/links/contacts/'
@@ -89,3 +90,21 @@ async def get_mta_data(mta_id):
             institution_data = await response.json()
     institution = next((item for item in institution_data if item["id"] == mta_id), None)
     return institution.get('string_ru')
+
+
+
+
+async def get_gift_options():
+    async with aiohttp.ClientSession() as session:
+        async with session.get(GIFT_URL) as response:
+            response.raise_for_status()
+            gift_data = await response.json()
+
+
+    gift_options = []
+    for item in gift_data:
+        gift_options.append({
+            'id': item['id'],
+            'gift_type_ru': item['gift_type_ru']
+        })
+    return gift_options

@@ -1,7 +1,7 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from idhandlers.idclass import MyCallbackData 
-from responses.apiformation import get_button_text, get_botword_text, get_contacts_data, get_links_data
+from responses.apiformation import get_button_text, get_botword_text, get_contacts_data, get_links_data, get_gift_options
 
 
 
@@ -137,7 +137,25 @@ async def give_inline():
     builder.add(
         InlineKeyboardButton(
             text="Начать анкету",
-            callback_data=MyCallbackData(action="questionare", value=1).pack()
+            callback_data=MyCallbackData(action="questionnaire", value=1).pack()
         )
     )
     return builder.as_markup()
+
+
+async def create_gift_keyboard():
+    gift_options = await get_gift_options()  
+    builder = InlineKeyboardBuilder()
+    max_buttons_per_row = 1 
+    for i in range(0, len(gift_options), max_buttons_per_row):
+        row_gifts = gift_options[i:i + max_buttons_per_row]
+        buttons = [
+            InlineKeyboardButton(
+                text=gift['gift_type_ru'],
+                callback_data=f"gift:{gift['id']}" 
+            )
+            for gift in row_gifts
+        ]
+        builder.row(*buttons)
+    markup = builder.as_markup()
+    return markup
