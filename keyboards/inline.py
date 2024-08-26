@@ -1,7 +1,7 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from idhandlers.idclass import MyCallbackData 
-from responses.apiformation import get_button_text, get_botword_text, get_contacts_data, get_links_data, get_gift_options
+from responses.apiformation import get_button_text, get_botword_text, get_contacts_data, get_links_data, get_gift_options,get_short_mta_list
 
 
 
@@ -9,28 +9,25 @@ from responses.apiformation import get_button_text, get_botword_text, get_contac
 
 
 async def inlinecontactsocial():
-    contacts = await get_botword_text(botword_id=4)
-    socials = await get_botword_text(botword_id=5)
     builder_contacts = InlineKeyboardBuilder()
     builder_contacts.button(
-        text=contacts,  # Здесь уже должен быть текст, а не корутина
+        text=await get_botword_text(pkwords='Contacts'),  # Здесь уже должен быть текст, а не корутина
         callback_data=MyCallbackData(action='contact', value=1).pack()
     )
     builder_contacts.button(
-        text=socials,  # Здесь тоже должен быть текст
+        text=await get_botword_text(pkwords='Links'),  # Здесь тоже должен быть текст
         callback_data=MyCallbackData(action='socials', value=2).pack()
     )
     return builder_contacts.as_markup()
 
 
+
 async def area_information():
-    mtb = await get_botword_text(botword_id=12)
-    med = await get_botword_text(botword_id=14)
-    oou = await get_botword_text(botword_id=13)
+
     buttons_data = [
-        (mtb, 'mtb'),
-        (med, 'med'),
-        (oou, 'oou')
+        (await get_botword_text(pkwords='Mtb'), 'mtb'),
+        (await get_botword_text(pkwords='Med'), 'med'),
+        (await get_botword_text(pkwords='OOU'), 'oou')
     ]
     builder_area = InlineKeyboardBuilder()
     for text, action in buttons_data:
@@ -69,9 +66,8 @@ async def links():
             for link in row_links
         ]
         builder.row(*buttons)
-    go_back = await get_button_text(button_id=6)
     back_button = InlineKeyboardButton(
-        text=go_back,
+        text=await get_button_text(pkname='Back'),
         callback_data=MyCallbackData(action='go_back', value=1).pack()
     )
     builder.add(back_button)
@@ -80,49 +76,29 @@ async def links():
 
 
 
-async def mtbinline():
-    # Получение текста для кнопок
-    mtb6 = await get_botword_text(botword_id=8)
-    mtb7 = await get_botword_text(botword_id=9)
-    mtb8 = await get_botword_text(botword_id=10)
-    mtb9 = await get_botword_text(botword_id=11)
-    mtb10 = await get_botword_text(botword_id=17)
-    mtb611 = await get_botword_text(botword_id=18)
+async def create_short_mta_keyboard():
+    short_mta_list = await get_short_mta_list()
 
-    buttons_data = [
-        (mtb6, 'mtb6'),
-        (mtb7, 'mtb7'),
-        (mtb8, 'mtb8'),
-        (mtb9, 'mtb9'),
-        (mtb10, 'mtb10'),
-        (mtb611, 'mtb11')
-    ]
     builder = InlineKeyboardBuilder()
-    max_buttons_per_row = 1
-    for i in range(0, len(buttons_data), max_buttons_per_row):
-        row_buttons = buttons_data[i:i + max_buttons_per_row]
-        buttons = [
+    for mta in short_mta_list:
+        builder.row(  
             InlineKeyboardButton(
-                text=text,
-                callback_data=MyCallbackData(action=action, value=1).pack()
+                text=mta['string'],
+                callback_data=MyCallbackData(action=f"mta_{mta['id']}", value=1).pack()
             )
-            for text, action in row_buttons
-        ]
-        builder.row(*buttons)
+        )
     return builder.as_markup()
 
 
 async def mtbinlinehelper():
-    menu_choice = await get_button_text(button_id=6)
-    back = await get_button_text(button_id=7)
     builder = InlineKeyboardBuilder()
     builder.row(
         InlineKeyboardButton(
-            text=menu_choice,
+            text=await get_button_text(pkname='Menu'),
             callback_data=MyCallbackData(action="menu_choice", value=1).pack()
         ),
         InlineKeyboardButton(
-            text=back,
+            text=await get_button_text(pkname='Back'),
             callback_data=MyCallbackData(action="back", value=1).pack()
         )
     )

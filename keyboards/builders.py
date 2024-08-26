@@ -17,7 +17,7 @@ def calc():
     return builder.as_markup(resize_keyboard=True)
 
 
-def profile(text: str | list):
+def profile(text):
     builder = ReplyKeyboardBuilder()
     
     if isinstance(text, str):

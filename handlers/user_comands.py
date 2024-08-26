@@ -11,7 +11,7 @@ router = Router()
 
 @router.message(CommandStart())
 async def start(message: types.Message):
-    response_text = await get_botword_text(botword_id=2)  
+    response_text = await get_botword_text(pkwords='Greetings')  
     keyboard = await main_keyboard()
     await message.reply(response_text, reply_markup=keyboard)
 

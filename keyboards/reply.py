@@ -11,28 +11,23 @@ from aiogram.types import (
 
 
 
-async def main_keyboard():
-    area_information = await get_button_text(2)  # Получаем текст кнопки с id=2
-    connection = await get_button_text(3)
-    give = await get_button_text(4)
-    menu_choice = await get_button_text(5)
-    language = await get_botword_text(botword_id=16)
+async def main_keyboard(): 
     
     # Создаем клавиатуру
     main = ReplyKeyboardMarkup(
         keyboard=[
             [
-                KeyboardButton(text=area_information),
-                KeyboardButton(text=connection)
+                KeyboardButton(text=await get_button_text(pkname='AreaInfo')),
+                KeyboardButton(text=await get_button_text(pkname='Connect'))
             ],
             [
-                KeyboardButton(text=give),
-                KeyboardButton(text=language)
+                KeyboardButton(text=await get_button_text(pkname='Gift')),
+                KeyboardButton(text=await get_button_text(pkname='ChoiceLang'))
             ]
         ],
         resize_keyboard=True,
         one_time_keyboard=True,
-        input_field_placeholder= menu_choice,
+        input_field_placeholder= await get_button_text(pkname='ChoiceMenu'),
     )
     return main
 

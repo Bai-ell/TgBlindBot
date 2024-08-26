@@ -13,8 +13,10 @@ router = Router()
 
 @router.message(F.text.lower().in_(["хай", "хелоу", "привет", "салам", 'hello', 'how are you?', 'salam', 'кандай','Кандай', 'hi']))
 async def greetings(message: Message):
-    response_text = await get_botword_text(botword_id=2)  
+    response_text = await get_botword_text(pkwords='Greetings')  
     await message.reply(response_text)
+
+
 
 
 @router.message()
@@ -22,35 +24,24 @@ async def echo(message: Message):
     msg = message.text.lower()
     
 
-    inline1 = await inlinecontactsocial()
-    keyboard = await main_keyboard()
-    area_information_markup = await area_information()
-    gift_keyboard= await create_gift_keyboard()
-    
-    connection_word = await get_button_text(button_id=3)
-    area_word = await get_button_text(button_id=2)  
-    gift= await get_button_text(button_id=4)
-    back = await get_button_text(button_id=6)
-    
-    choice_lang = await get_botword_text(botword_id=3)
-    contacts = await get_botword_text(botword_id=4)
-    area_info = await get_botword_text(botword_id=7)
-    back_menu = await get_botword_text(botword_id=15)
-    language = await get_botword_text(botword_id=16)
-    gifttype = await get_botword_text(botword_id=20)
-    
-    
+    if msg == (await get_button_text(pkname='Connect')).lower():
+        await message.answer(await get_botword_text(pkwords='Contacts'), reply_markup=await inlinecontactsocial())
 
-    if msg == connection_word.lower():
-        await message.answer(contacts, reply_markup=inline1)
-    elif msg == area_word.lower():
-        await message.answer(f'<b>{area_word}:\n{area_info}</b>', parse_mode= 'HTML',reply_markup=area_information_markup) 
-    elif msg == gift.lower():
-        await message.answer(gifttype, reply_markup=gift_keyboard)
-    elif msg == language:
-        await message.answer(choice_lang, reply_markup=keyboard)
-    elif msg == back.lower():
-        await message.answer(back_menu, reply_markup=keyboard)
+
+    elif msg == (await get_button_text(pkname='AreaInfo')).lower():
+        await message.answer(f'<b>{await get_button_text(pkname="AreaInfo")}:\n{await get_botword_text(pkwords="InfoOctoberArea")}</b>', parse_mode= 'HTML',reply_markup=await area_information())
+
+
+    elif msg == (await get_button_text(pkname='Gift')).lower():
+        await message.answer(await get_botword_text(pkwords='ChoiceGift'), reply_markup=await create_gift_keyboard())
+
+
+    elif msg == await get_button_text(pkname='ChoiceLang'):
+        await message.answer(await get_botword_text(pkwords='ChangeLang'), reply_markup=await main_keyboard())
+
+
+    elif msg == (await get_button_text(pkname='Back')).lower():
+        await message.answer(await get_botword_text(pkwords='GoToMenu'), reply_markup=await main_keyboard())
 
 
 
