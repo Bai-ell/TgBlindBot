@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery
 from keyboards import reply, inline
 from keyboards.reply import main_keyboard
 from responses.apiformation import get_button_text, get_botword_text
-from keyboards.inline import inlinecontactsocial, area_information, give_inline, create_gift_keyboard
+from keyboards.inline import inlinecontactsocial, area_information, gift_inline
 
 
 
@@ -33,7 +33,7 @@ async def echo(message: Message):
 
 
     elif msg == (await get_button_text(pkname='Gift')).lower():
-        await message.answer(await get_botword_text(pkwords='ChoiceGift'), reply_markup=await create_gift_keyboard())
+        await message.answer(await get_botword_text(pkwords='Questionnaire'), reply_markup=await gift_inline())
 
 
     elif msg == await get_button_text(pkname='ChoiceLang'):

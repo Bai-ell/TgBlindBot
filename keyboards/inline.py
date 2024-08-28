@@ -11,14 +11,16 @@ from responses.apiformation import get_button_text, get_botword_text, get_contac
 async def inlinecontactsocial():
     builder_contacts = InlineKeyboardBuilder()
     builder_contacts.button(
-        text=await get_botword_text(pkwords='Contacts'),  # Здесь уже должен быть текст, а не корутина
+        text=await get_botword_text(pkwords='Contacts'),  
         callback_data=MyCallbackData(action='contact', value=1).pack()
     )
     builder_contacts.button(
-        text=await get_botword_text(pkwords='Links'),  # Здесь тоже должен быть текст
+        text=await get_botword_text(pkwords='Links'),  
         callback_data=MyCallbackData(action='socials', value=2).pack()
     )
     return builder_contacts.as_markup()
+
+
 
 
 
@@ -41,6 +43,9 @@ async def area_information():
 
 
 
+
+
+
 async def contacts():
     contacts = await get_contacts_data()
     messages = []
@@ -51,6 +56,9 @@ async def contacts():
         messages.append(message)
     full_message = "\n".join(messages)
     return full_message
+
+
+
 
 
 
@@ -76,6 +84,10 @@ async def links():
 
 
 
+
+
+
+
 async def create_short_mta_keyboard():
     short_mta_list = await get_short_mta_list()
 
@@ -88,6 +100,10 @@ async def create_short_mta_keyboard():
             )
         )
     return builder.as_markup()
+
+
+
+
 
 
 async def mtbinlinehelper():
@@ -106,17 +122,25 @@ async def mtbinlinehelper():
     
     
     
-async def give_inline():
+
+
+
+async def gift_inline():
     
     builder = InlineKeyboardBuilder()
     
     builder.add(
         InlineKeyboardButton(
-            text="Начать анкету",
+            text=await get_botword_text(pkwords='StartQuestionnaire'),
             callback_data=MyCallbackData(action="questionnaire", value=1).pack()
         )
     )
     return builder.as_markup()
+
+
+    
+
+
 
 
 async def create_gift_keyboard():
@@ -125,13 +149,25 @@ async def create_gift_keyboard():
     max_buttons_per_row = 1 
     for i in range(0, len(gift_options), max_buttons_per_row):
         row_gifts = gift_options[i:i + max_buttons_per_row]
-        buttons = [
-            InlineKeyboardButton(
-                text=gift['gift_type_ru'],
-                callback_data=f"gift:{gift['id']}" 
-            )
-            for gift in row_gifts
-        ]
+        try:
+
+            buttons = [
+                InlineKeyboardButton(
+                        text=gift['gift_type_ru'],
+                        
+                        callback_data=f"gift:{gift['id']}" 
+                )
+                for gift in row_gifts
+            ]
+        except KeyError:
+            buttons = [
+                InlineKeyboardButton(
+                        text=gift['gift_type_kg'],
+                        
+                        callback_data=f"gift:{gift['id']}" 
+                )
+                for gift in row_gifts
+            ]
         builder.row(*buttons)
     markup = builder.as_markup()
     return markup

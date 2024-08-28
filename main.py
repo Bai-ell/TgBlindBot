@@ -13,9 +13,9 @@ async def main() -> None:
 
     dp.include_routers(
         user_comands.router,
-        bot_messages.router,
         questionaire.router,
-        callback_handlers.router
+        callback_handlers.router,
+        bot_messages.router
     )
 
     await bot.delete_webhook(drop_pending_updates=True)

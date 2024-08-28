@@ -15,3 +15,5 @@ async def start(message: types.Message):
     keyboard = await main_keyboard()
     await message.reply(response_text, reply_markup=keyboard)
 
+
+
