@@ -26,8 +26,8 @@ router = Router()
 
 @router.callback_query(MyCallbackData.filter(F.action == "questionnaire"))
 async def start_questionnaire(callback: types.CallbackQuery, state: FSMContext):
-    keyboard = await create_gift_keyboard()
-    await callback.message.answer(await get_botword_text(pkwords='ChoiceGiftQuestionnaire'), reply_markup=keyboard)
+    keyboard = await create_gift_keyboard(user_id=callback.from_user.id)
+    await callback.message.answer(await get_botword_text(pkwords='ChoiceGiftQuestionnaire',user_id=callback.from_user.id), reply_markup=keyboard)
     await state.set_state(Form.gift_type)
 
 
@@ -38,7 +38,7 @@ async def process_gift_choice(callback: types.CallbackQuery, state: FSMContext):
     
     # Сохраняем выбранный подарок в состоянии
     await state.update_data(gift_id=gift_id)
-    await callback.message.answer(await get_botword_text(pkwords='AnswerName'), reply_markup=await profile(callback.from_user.first_name))
+    await callback.message.answer(await get_botword_text(pkwords='AnswerName',user_id=callback.from_user.id), reply_markup=await profile(callback.from_user.first_name))
     
 
 
@@ -48,7 +48,7 @@ async def process_gift_choice(callback: types.CallbackQuery, state: FSMContext):
 async def process_name(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
     await state.set_state(Form.phone_number)
-    await message.answer(await get_botword_text(pkwords='AnswerPhoneNumber'), reply_markup=rmk)
+    await message.answer(await get_botword_text(pkwords='AnswerPhoneNumber',user_id=message.from_user.id), reply_markup=rmk)
 
 
 
@@ -56,7 +56,7 @@ async def process_name(message: types.Message, state: FSMContext):
 async def process_phone_number(message: types.Message, state: FSMContext):
     await state.update_data(phone_number=message.text)
     await state.set_state(Form.date_of_birth)
-    await message.answer(await get_botword_text(pkwords='AnswerDateOfBirth'))
+    await message.answer(await get_botword_text(pkwords='AnswerDateOfBirth',user_id=message.from_user.id))
     
 
 
@@ -65,7 +65,7 @@ async def process_phone_number(message: types.Message, state: FSMContext):
 async def process_date_of_birth(message: types.Message, state: FSMContext):
     await state.update_data(date_of_birth=message.text)
     await state.set_state(Form.address)
-    await message.answer(await get_botword_text(pkwords='AnswerAdress'))
+    await message.answer(await get_botword_text(pkwords='AnswerAdress',user_id=message.from_user.id))
 
 
 
@@ -74,7 +74,7 @@ async def process_address(message: types.Message, state: FSMContext):
     await state.update_data(address=message.text)
     data = await state.get_data()
     gift_id = data.get("gift_id")
-    gift = next((gift for gift in await get_gift_options() if gift['id'] == int(gift_id)), None)
+    gift = next((gift for gift in await get_gift_options(user_id=message.from_user.id) if gift['id'] == int(gift_id)), None)
     try:
         if gift['gift_type_ru']:
             gift_name = gift['gift_type_ru']
@@ -90,15 +90,15 @@ async def process_address(message: types.Message, state: FSMContext):
     
    
     await message.answer(
-        f"{await get_botword_text(pkwords='EndQuestionnaire')}\n"
-        f"{await get_botword_text(pkwords='Gift')}: {gift_name}\n"
-        f"{await get_botword_text(pkwords='Name')}: {name}\n"
-        f"{await get_botword_text(pkwords='Phone')}: {phone_number}\n"
-        f"{await get_botword_text(pkwords='BirthDate')}: {date_of_birth}\n"
-        f"{await get_botword_text(pkwords='Address')}: {address}"
+        f"{await get_botword_text(pkwords='EndQuestionnaire',user_id=message.from_user.id)}\n"
+        f"{await get_botword_text(pkwords='Gift',user_id=message.from_user.id)}: {gift_name}\n"
+        f"{await get_botword_text(pkwords='Name',user_id=message.from_user.id)}: {name}\n"
+        f"{await get_botword_text(pkwords='Phone',user_id=message.from_user.id)}: {phone_number}\n"
+        f"{await get_botword_text(pkwords='BirthDate',user_id=message.from_user.id)}: {date_of_birth}\n"
+        f"{await get_botword_text(pkwords='Address',user_id=message.from_user.id)}: {address}"
     )
     await message.answer(
-        await get_botword_text(pkwords='SendQuestionnaire'), reply_markup= await main_keyboard()
+        await get_botword_text(pkwords='SendQuestionnaire',user_id=message.from_user.id), reply_markup= await main_keyboard(user_id=message.from_user.id)
     )
     
     json_file_path = '/Users/apple/Work/GetLead/OpenSourceWork/TgBlindBot/responses/tgtest.json'

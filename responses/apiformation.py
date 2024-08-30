@@ -19,7 +19,14 @@ CONTACTS = config('CONTACTS')
 MTA = config('MTA')
 LINKS = config('LINKS')
 
+user_languages = {}
 
+
+def change_language(user_id):
+    current_lang = user_languages.get(user_id, 'ru')  # По умолчанию 'ru'
+    new_lang = 'kg' if current_lang == 'ru' else 'ru'
+    user_languages[user_id] = new_lang
+    return new_lang
 
 
 async def fetch_mta_data_from_api() -> List[Dict]:
@@ -29,50 +36,62 @@ async def fetch_mta_data_from_api() -> List[Dict]:
 
 
 
-async def get_botword_text(pkwords):
+async def get_botword_text(pkwords, user_id):
+    lang = user_languages.get(user_id, 'ru')  # Получаем текущий язык пользователя
+    
     async with aiohttp.ClientSession() as session:
         async with session.get(BOTWORDS) as response:
             response.raise_for_status()
             botword_data = await response.json()
     
     specific_botword = next((item for item in botword_data if item["pkwords"] == pkwords), None)
-    return specific_botword[f'botwords_ru'] if specific_botword else None
+    return specific_botword.get(f'botwords_{lang}', None) if specific_botword else None
 
 
-async def get_short_mta_list(language='ru'):
+
+
+async def get_short_mta_list(user_id):
+    lang = user_languages.get(user_id, 'ru')  # Получаем текущий язык пользователя
+    
     async with aiohttp.ClientSession() as session:
         async with session.get(SHORT_MTA_URL) as response:
             response.raise_for_status()
             short_mta_data = await response.json()
     
-    # Фильтрация данных по языку
     return [
         {
             "id": item["id"],
-            "string": item.get(f'string_{language}')
+            "string": item.get(f'string_{lang}')
         }
         for item in short_mta_data
     ]
 
 
-async def get_button_text(pkname):
+
+async def get_button_text(pkname, user_id):
+    lang = user_languages.get(user_id, 'ru')  # Получаем текущий язык пользователя
+    
     async with aiohttp.ClientSession() as session:
         async with session.get(BUTTONS) as response:
             response.raise_for_status()
             button_data = await response.json()
     
     specific_button = next((item for item in button_data if item["pkname"] == pkname), None)
-    return specific_button["button_ru"] if specific_button else None
+    return specific_button.get(f"button_{lang}", None) if specific_button else None
 
 
-async def get_contacts_data():
+
+
+async def get_contacts_data(user_id):
+    lang = user_languages.get(user_id, 'ru')  # Получаем текущий язык пользователя
+    
     async with aiohttp.ClientSession() as session:
         async with session.get(CONTACTS) as response:
             response.raise_for_status()
             data = await response.json()
             contacts = []
             for contact in data:
-                name = contact['ru_name']
+                name = contact.get(f'{lang}_name', 'Имя не доступно')
                 contacts.append({
                     'name': name,
                     'link': contact['link']
@@ -80,19 +99,24 @@ async def get_contacts_data():
             return contacts
 
 
-async def get_links_data():
+
+
+async def get_links_data(user_id):
+    lang = user_languages.get(user_id, 'ru')  # Получаем текущий язык пользователя
+    
     async with aiohttp.ClientSession() as session:
         async with session.get(LINKS) as response:
             response.raise_for_status()
             data = await response.json()
             links = []
             for link in data:
-                name = link['ru_name']
+                name = link.get(f'{lang}_name', 'Имя не доступно')
                 links.append({
                     'name': name,
                     'link': link['link']
                 })
             return links
+
 
 
 
@@ -115,50 +139,60 @@ async def send_questionnaire_data(name, phone_number, date_of_birth, address, gi
 
 
 
-async def get_institution_data(institution_id):
+async def get_institution_data(institution_id, user_id):
+    lang = user_languages.get(user_id, 'ru')  # Получаем текущий язык пользователя
+    
     async with aiohttp.ClientSession() as session:
         async with session.get(INSTITUTIONS) as response:
             response.raise_for_status()
             institution_data = await response.json()
+    
     institution = next((item for item in institution_data if item["id"] == institution_id), None)
-    return institution.get('string_ru')
+    return institution.get(f'string_{lang}', 'Информация отсутствует.') if institution else 'Информация отсутствует.'
 
 
 
-async def get_mta_data_by_id(mta_id):
+
+async def get_mta_data_by_id(mta_id, user_id) -> str:
+    lang = user_languages.get(user_id, 'ru')  # Получаем текущий язык пользователя
+    
     async with aiohttp.ClientSession() as session:
         async with session.get(MTA) as response:
             response.raise_for_status()
             institution_data = await response.json()
-    
 
     number_pattern = re.compile(r'№\s*(\d{1,2})')
 
     for item in institution_data:
-        match = number_pattern.search(item["string_ru"])
+        match = number_pattern.search(item.get(f'string_{lang}', ''))
         if match:
             found_number = int(match.group(1))
             if found_number == mta_id:
-                result = item.get('string_ru', 'Информация отсутствует.')
+                result = item.get(f'string_{lang}', 'Информация отсутствует.')
                 return result
+    return 'Информация отсутствует.'
 
 
 
 
-async def get_gift_options():
+
+async def get_gift_options(user_id):
+    lang = user_languages.get(user_id, 'ru')  # Получаем текущий язык пользователя
+    
     async with aiohttp.ClientSession() as session:
         async with session.get(GIFT_URL) as response:
             response.raise_for_status()
             gift_data = await response.json()
-
-
+    
     gift_options = []
     for item in gift_data:
         gift_options.append({
             'id': item['id'],
-            'gift_type_kg': item['gift_type_ru']
+            f'gift_type_{lang}': item[f'gift_type_{lang}']
         })
     return gift_options
+
+
 
 
 

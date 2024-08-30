@@ -11,22 +11,22 @@ from aiogram.types import (
 
 
 
-async def main_keyboard(): 
+async def main_keyboard(user_id): 
     
     main = ReplyKeyboardMarkup(
         keyboard=[
             [
-                KeyboardButton(text=await get_button_text(pkname='AreaInfo')),
-                KeyboardButton(text=await get_button_text(pkname='Connect'))
+                KeyboardButton(text=await get_button_text(pkname='AreaInfo', user_id=user_id)),
+                KeyboardButton(text=await get_button_text(pkname='Connect', user_id=user_id))
             ],
             [
-                KeyboardButton(text=await get_button_text(pkname='Gift')),
-                KeyboardButton(text=await get_button_text(pkname='ChoiceLang'))
+                KeyboardButton(text=await get_button_text(pkname='Gift', user_id=user_id)),
+                KeyboardButton(text=await get_button_text(pkname='ChoiceLang', user_id=user_id))
             ]
         ],
         resize_keyboard=True,
         one_time_keyboard=True,
-        input_field_placeholder= await get_button_text(pkname='ChoiceMenu'),
+        input_field_placeholder= await get_button_text(pkname='ChoiceMenu', user_id=user_id),
     )
     return main
 

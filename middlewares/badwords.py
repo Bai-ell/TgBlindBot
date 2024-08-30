@@ -2,6 +2,7 @@ from typing import Callable, Awaitable, Dict, Any, List
 from aiogram import BaseMiddleware
 from aiogram.types import Message
 import json
+from responses.apiformation import get_botword_text
 
 class MultiLangBadWordsMiddleware(BaseMiddleware):
     def __init__(self, file_paths: List[str]) -> None:
@@ -27,7 +28,7 @@ class MultiLangBadWordsMiddleware(BaseMiddleware):
 
             
             if any(bad_word in message_text for bad_word in self.bad_words):
-                await event.answer("Пожалуйста, не используйте такие слова!")
+                await event.answer(f'{await get_botword_text(pkwords="WarningWord",user_id = event.from_user.id)}')
                 return
 
         return await handler(event, data)

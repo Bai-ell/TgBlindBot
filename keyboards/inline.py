@@ -8,14 +8,14 @@ import re
 
 
 
-async def inlinecontactsocial():
+async def inlinecontactsocial(user_id):
     builder_contacts = InlineKeyboardBuilder()
     builder_contacts.button(
-        text=await get_botword_text(pkwords='Contacts'),  
+        text=await get_botword_text(pkwords='Contacts', user_id=user_id),  
         callback_data=MyCallbackData(action='contact', value=1).pack()
     )
     builder_contacts.button(
-        text=await get_botword_text(pkwords='Links'),  
+        text=await get_botword_text(pkwords='Links', user_id=user_id),  
         callback_data=MyCallbackData(action='socials', value=2).pack()
     )
     return builder_contacts.as_markup()
@@ -24,12 +24,12 @@ async def inlinecontactsocial():
 
 
 
-async def area_information():
+async def area_information(user_id):
 
     buttons_data = [
-        (await get_botword_text(pkwords='Mtb'), 'mtb'),
-        (await get_botword_text(pkwords='Med'), 'med'),
-        (await get_botword_text(pkwords='OOU'), 'oou')
+        (await get_botword_text(pkwords='Mtb',user_id=user_id), 'mtb'),
+        (await get_botword_text(pkwords='Med',user_id=user_id), 'med'),
+        (await get_botword_text(pkwords='OOU',user_id=user_id), 'oou')
     ]
     builder_area = InlineKeyboardBuilder()
     for text, action in buttons_data:
@@ -46,8 +46,8 @@ async def area_information():
 
 
 
-async def contacts():
-    contacts = await get_contacts_data()
+async def contacts(user_id):
+    contacts = await get_contacts_data(user_id=user_id)
     messages = []
     for contact in contacts:
         message = (
@@ -63,8 +63,8 @@ async def contacts():
 
 
 
-async def links():
-    links = await get_links_data()
+async def links(user_id):
+    links = await get_links_data(user_id=user_id)
     builder = InlineKeyboardBuilder()
     max_buttons_per_row = 2  
     for i in range(0, len(links), max_buttons_per_row):
@@ -75,7 +75,7 @@ async def links():
         ]
         builder.row(*buttons)
     back_button = InlineKeyboardButton(
-        text=await get_button_text(pkname='Back'),
+        text=await get_button_text(pkname='Back', user_id=user_id),
         callback_data=MyCallbackData(action='go_back', value=1).pack()
     )
     builder.add(back_button)
@@ -88,7 +88,7 @@ async def links():
 
 
 
-async def create_short_mta_keyboard() -> InlineKeyboardMarkup:
+async def create_short_mta_keyboard(user_id) -> InlineKeyboardMarkup:
     mta_list = await fetch_mta_data_from_api()
     builder = InlineKeyboardBuilder()
 
@@ -102,7 +102,7 @@ async def create_short_mta_keyboard() -> InlineKeyboardMarkup:
             mta_id = int(match.group(1))
             builder.row(
                 InlineKeyboardButton(
-                    text=f"{await get_botword_text(pkwords='Mtb')} {mta_id}",
+                    text=f"{await get_botword_text(pkwords='Mtb', user_id=user_id)} {mta_id}",
                     callback_data=MyCallbackData(action=f"mta_{mta_id}", value=1).pack()
                 )
             )
@@ -113,15 +113,15 @@ async def create_short_mta_keyboard() -> InlineKeyboardMarkup:
 
 
 
-async def mtbinlinehelper():
+async def mtbinlinehelper(user_id):
     builder = InlineKeyboardBuilder()
     builder.row(
         InlineKeyboardButton(
-            text=await get_button_text(pkname='Menu'),
+            text=await get_button_text(pkname='Menu', user_id=user_id),
             callback_data=MyCallbackData(action="menu_choice", value=1).pack()
         ),
         InlineKeyboardButton(
-            text=await get_button_text(pkname='Back'),
+            text=await get_button_text(pkname='Back', user_id=user_id),
             callback_data=MyCallbackData(action="back", value=1).pack()
         )
     )
@@ -132,13 +132,13 @@ async def mtbinlinehelper():
 
 
 
-async def gift_inline():
+async def gift_inline(user_id):
     
     builder = InlineKeyboardBuilder()
     
     builder.add(
         InlineKeyboardButton(
-            text=await get_botword_text(pkwords='StartQuestionnaire'),
+            text=await get_botword_text(pkwords='StartQuestionnaire', user_id=user_id),
             callback_data=MyCallbackData(action="questionnaire", value=1).pack()
         )
     )
@@ -150,8 +150,8 @@ async def gift_inline():
 
 
 
-async def create_gift_keyboard():
-    gift_options = await get_gift_options()  
+async def create_gift_keyboard(user_id):
+    gift_options = await get_gift_options(user_id=user_id)  
     builder = InlineKeyboardBuilder()
     max_buttons_per_row = 1 
     for i in range(0, len(gift_options), max_buttons_per_row):
