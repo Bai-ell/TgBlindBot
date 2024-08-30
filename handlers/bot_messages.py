@@ -4,6 +4,9 @@ from keyboards import reply, inline
 from keyboards.reply import main_keyboard
 from responses.apiformation import get_button_text, get_botword_text
 from keyboards.inline import inlinecontactsocial, area_information, gift_inline
+import aioredis
+
+
 
 
 
@@ -25,7 +28,7 @@ async def echo(message: Message):
     
 
     if msg == (await get_button_text(pkname='Connect')).lower():
-        await message.answer(await get_botword_text(pkwords='Contacts'), reply_markup=await inlinecontactsocial())
+        await message.answer(await get_button_text(pkname='Connect'), reply_markup=await inlinecontactsocial())
 
 
     elif msg == (await get_button_text(pkname='AreaInfo')).lower():

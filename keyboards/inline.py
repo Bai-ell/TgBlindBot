@@ -1,8 +1,8 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from idhandlers.idclass import MyCallbackData 
-from responses.apiformation import get_button_text, get_botword_text, get_contacts_data, get_links_data, get_gift_options,get_short_mta_list
-
+from responses.apiformation import get_button_text, get_botword_text, get_contacts_data, get_links_data, get_gift_options,fetch_mta_data_from_api
+import re
 
 
 
@@ -88,17 +88,24 @@ async def links():
 
 
 
-async def create_short_mta_keyboard():
-    short_mta_list = await get_short_mta_list()
-
+async def create_short_mta_keyboard() -> InlineKeyboardMarkup:
+    mta_list = await fetch_mta_data_from_api()
     builder = InlineKeyboardBuilder()
-    for mta in short_mta_list:
-        builder.row(  
-            InlineKeyboardButton(
-                text=mta['string'],
-                callback_data=MyCallbackData(action=f"mta_{mta['id']}", value=1).pack()
+
+    # Регулярное выражение для поиска числа после знака №
+    number_pattern = re.compile(r'№\s*(\d{1,2})')
+
+    for mta in mta_list:
+        # Поиск числа после знака №
+        match = number_pattern.search(mta['string_ru'])
+        if match:
+            mta_id = int(match.group(1))
+            builder.row(
+                InlineKeyboardButton(
+                    text=f"{await get_botword_text(pkwords='Mtb')} {mta_id}",
+                    callback_data=MyCallbackData(action=f"mta_{mta_id}", value=1).pack()
+                )
             )
-        )
     return builder.as_markup()
 
 

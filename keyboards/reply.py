@@ -13,7 +13,6 @@ from aiogram.types import (
 
 async def main_keyboard(): 
     
-    # Создаем клавиатуру
     main = ReplyKeyboardMarkup(
         keyboard=[
             [

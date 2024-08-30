@@ -4,7 +4,7 @@ from aiogram import F
 from keyboards.inline import contacts,  links, create_short_mta_keyboard, mtbinlinehelper, gift_inline
 from idhandlers.idclass import MyCallbackData 
 from keyboards.reply import main_keyboard  
-from responses.apiformation import get_botword_text, get_institution_data, get_mta_data, get_button_text
+from responses.apiformation import get_botword_text, get_institution_data, get_mta_data_by_id
 
 
 
@@ -59,8 +59,11 @@ async def handle_menu_and_back_buttons(query: CallbackQuery, callback_data: MyCa
 @router.callback_query(MyCallbackData.filter(F.action.startswith("mta_")))
 async def mtb_detailed_callback_handler(query: CallbackQuery, callback_data: MyCallbackData):
     mta_id = int(callback_data.action.split("_")[1])
+    institution_text = await get_mta_data_by_id(mta_id)
 
-    await query.message.answer(f'<b>{await get_mta_data(mta_id)}</b>', reply_markup=await mtbinlinehelper(), parse_mode='HTML')
+    await query.message.answer(
+        f'<b>{institution_text}</b>', 
+        reply_markup=await mtbinlinehelper(), 
+        parse_mode='HTML'
+    )
     await query.answer()
-    
-    

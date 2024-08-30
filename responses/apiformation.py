@@ -3,8 +3,9 @@ import gspread
 from google.oauth2.service_account import Credentials
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-import os
+import os,re
 from decouple import config
+from typing import List, Dict
 
 
 
@@ -17,6 +18,14 @@ BUTTONS  =config('BUTTONS')
 CONTACTS = config('CONTACTS')
 MTA = config('MTA')
 LINKS = config('LINKS')
+
+
+
+
+async def fetch_mta_data_from_api() -> List[Dict]:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(MTA) as response:
+            return await response.json()
 
 
 
@@ -115,13 +124,23 @@ async def get_institution_data(institution_id):
     return institution.get('string_ru')
 
 
-async def get_mta_data(mta_id):
+
+async def get_mta_data_by_id(mta_id):
     async with aiohttp.ClientSession() as session:
         async with session.get(MTA) as response:
             response.raise_for_status()
             institution_data = await response.json()
-    institution = next((item for item in institution_data if item["id"] == mta_id), None)
-    return institution.get('string_ru')
+    
+
+    number_pattern = re.compile(r'№\s*(\d{1,2})')
+
+    for item in institution_data:
+        match = number_pattern.search(item["string_ru"])
+        if match:
+            found_number = int(match.group(1))
+            if found_number == mta_id:
+                result = item.get('string_ru', 'Информация отсутствует.')
+                return result
 
 
 
