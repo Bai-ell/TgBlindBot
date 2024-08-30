@@ -1,8 +1,8 @@
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
+user_languages = {}
 
-
-def profile(text):
+async def profile(text):
     builder = ReplyKeyboardBuilder()
     
     if isinstance(text, str):

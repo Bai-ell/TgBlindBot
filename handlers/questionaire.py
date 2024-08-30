@@ -34,12 +34,11 @@ async def start_questionnaire(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(lambda c: c.data.startswith('gift:'))
 async def process_gift_choice(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Form.name)
-    print(callback.data)
     gift_id = callback.data.split(':')[1]
     
     # Сохраняем выбранный подарок в состоянии
     await state.update_data(gift_id=gift_id)
-    await callback.message.answer(await get_botword_text(pkwords='AnswerName'), reply_markup=profile(callback.from_user.first_name))
+    await callback.message.answer(await get_botword_text(pkwords='AnswerName'), reply_markup=await profile(callback.from_user.first_name))
     
 
 
@@ -88,11 +87,7 @@ async def process_address(message: types.Message, state: FSMContext):
 
     await send_questionnaire_data(name, phone_number, date_of_birth, address, gift_name)
 
-
-    json_file_path = '/Users/apple/Work/GetLead/OpenSourceWork/TgBlindBot/responses/tgtest.json'
-    sheet_name = 'TestTgBot' 
-    sheet = await connect_to_google_sheet(json_file_path, sheet_name)
-    await send_data_to_google_sheet(sheet, [name, phone_number, date_of_birth, address, gift_name])
+    
    
     await message.answer(
         f"{await get_botword_text(pkwords='EndQuestionnaire')}\n"
@@ -105,6 +100,11 @@ async def process_address(message: types.Message, state: FSMContext):
     await message.answer(
         await get_botword_text(pkwords='SendQuestionnaire'), reply_markup= await main_keyboard()
     )
+    
+    json_file_path = '/Users/apple/Work/GetLead/OpenSourceWork/TgBlindBot/responses/tgtest.json'
+    sheet_name = 'TestTgBot' 
+    sheet = await connect_to_google_sheet(json_file_path, sheet_name)
+    await send_data_to_google_sheet(sheet, [name, phone_number, date_of_birth, address, gift_name])
     
  
     await state.clear()
